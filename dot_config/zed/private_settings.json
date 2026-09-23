@@ -1,0 +1,1 @@
+{"show_edit_predictions": false, "edit_predictions": {"provider":"zed"}, "agent": {"default_model":{"provider":"zed.dev","model":"gpt-6-sol","enable_thinking":true,"effort":"medium"},"favorite_models":[],"model_parameters":[]}, "session": {"trust_all_worktrees":false}, "vim_mode": true, "theme": "Tokyo Night"}

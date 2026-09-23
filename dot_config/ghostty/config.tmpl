@@ -1,0 +1,39 @@
+{{ if eq .chezmoi.os "darwin" -}}
+# Theme
+theme = TokyoNight
+
+# Font
+font-size = 14
+{{- else -}}
+# Dynamic theme colors
+config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
+
+# Font
+font-size = 11
+{{- end }}
+
+# Window
+window-theme = ghostty
+window-padding-x = 6
+window-padding-y = 6
+window-padding-balance = true
+resize-overlay = never
+quit-after-last-window-closed = false
+
+# Opacity
+background-opacity = 0.97
+background-blur-radius = 20
+
+# Mouse
+mouse-hide-while-typing = true
+
+# Cursor styling
+cursor-style = "bar"
+
+# Cursor styling + SSH session terminfo
+# (all shell integration options must be passed together)
+shell-integration-features = no-cursor,ssh-env,ssh-terminfo
+
+# Keyboard bindings
+# Send Shift+Enter as CSI-u so terminal apps can distinguish it from Enter.
+keybind = shift+enter=csi:13;2u

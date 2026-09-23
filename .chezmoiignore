@@ -1,0 +1,13 @@
+# Targets chezmoi must not manage on this machine. Paths are relative to $HOME.
+# This file is always a template, so OS checks work without a .tmpl suffix.
+
+{{ if ne .chezmoi.os "linux" -}}
+# Linux only: Wayland launcher and compositor.
+.config/vicinae
+.config/hypr
+.config/omarchy
+.config/xdg-terminals.list
+.config/spotify-flags.conf
+# Zed is only installed on Omarchy.
+.config/zed
+{{ end -}}

@@ -1,0 +1,20 @@
+# Tokyo Night (night variant), matching the oh-my-posh and Zed themes.
+[theme]
+name = "tokyo-night"
+
+[colors]
+AlertInfo = "#9ece6a"
+AlertWarn = "#ff9e64"
+AlertError = "#f7768e"
+Annotation = "#7aa2f7"
+Base = "#c0caf5"
+Guidance = "#a9b1d6"
+Important = "#bb9af7"
+Title = "#7dcfff"
+Muted = "#565f89"
+SyntaxCommand = "#7aa2f7"
+SyntaxFlag = "#e0af68"
+SyntaxString = "#9ece6a"
+SyntaxVariable = "#f7768e"
+SyntaxOperator = "#89ddff"
+SyntaxComment = "#565f89"

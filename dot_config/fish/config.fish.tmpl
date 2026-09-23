@@ -1,0 +1,161 @@
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║                            Fish Shell Configuration                          ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+
+# Silence the default greeting.
+set -g fish_greeting ""
+
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║                                     PATH                                     ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+
+# Set before anything else, since the tools initialized further down live here.
+#
+# -g keeps fish_user_paths global, rebuilt from this file on every shell. The
+# default is a universal variable stored in fish_variables, which sits outside
+# version control and outlives removing a line from this file.
+#
+# Directories that do not exist are ignored.
+#   ~/.local/bin  user binaries and npm's global prefix (see ~/.npmrc)
+#   ~/.bun/bin    bun
+#   ~/.grok/bin   grok
+fish_add_path -g ~/.local/bin ~/.bun/bin ~/.grok/bin
+
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║                            Environment Variables                             ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+
+# git prefers VISUAL over EDITOR, so VISUAL is what opens commit messages.
+# VS Code needs --wait, otherwise it returns at once and git reads an empty buffer.
+set -gx EDITOR nvim
+set -gx VISUAL "code --wait"
+set -gx SUDO_EDITOR nvim
+
+set -gx TERMINAL ghostty
+
+# bun's install root.
+set -gx BUN_INSTALL "$HOME/.bun"
+
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║                          OS-Specific Configuration                           ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+#
+# PATH and environment changes that apply to a single OS. They belong above the
+# interactive block, which resolves commands and must run last. macOS Homebrew
+# shellenv goes here.
+
+{{ if eq .chezmoi.os "darwin" -}}
+# lazygit (and other XDG-aware tools) default to ~/Library/Application Support
+# on macOS. Point them at ~/.config so one chezmoi target serves both OSes.
+set -gx XDG_CONFIG_HOME "$HOME/.config"
+
+# Apple Silicon Homebrew. shellenv detects the calling shell and prints fish
+# syntax, so this is the fish equivalent of the zsh line in the Homebrew docs.
+# It sets PATH, MANPATH, INFOPATH and the HOMEBREW_* variables.
+if test -x /opt/homebrew/bin/brew
+    eval (/opt/homebrew/bin/brew shellenv)
+end
+{{ else -}}
+# Omarchy exports this from /etc/profile.d/omarchy.sh, which is POSIX sh and so
+# is never read by fish. Omarchy commands like `omarchy theme list` build paths
+# from it, so set it here for the case where fish is the login shell.
+if test -d /usr/share/omarchy
+    set -gx OMARCHY_PATH /usr/share/omarchy
+end
+{{ end -}}
+
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║                          Interactive Shells Only                             ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+#
+# fish reads config.fish for every shell it starts, including `fish -c ...` and
+# scripts. Prompt, key bindings, history and aliases belong in interactive shells
+# only, so scripts stay fast and get real ls rather than eza.
+
+if status is-interactive
+    # Every tool is guarded with command -q so a machine that lacks one starts
+    # a shell without errors and simply skips that integration.
+
+    # Loaded everywhere, including Zed and VSCode terminals.
+    if command -q oh-my-posh
+        oh-my-posh init fish --config ~/.config/ohmyposh/tokyo_night.toml | source
+    end
+
+    # fzf first, so atuin's Ctrl-R binding wins.
+    command -q fzf; and fzf --fish | source
+    command -q atuin; and atuin init fish | source
+    command -q zoxide; and zoxide init fish | source
+
+    # ┌──────────────────────────────────────────────────────────────────────────┐
+    # │ Theme: TokyoNight                                                        │
+    # └──────────────────────────────────────────────────────────────────────────┘
+
+    # Color palette
+    set -l foreground c0caf5
+    set -l selection 283457
+    set -l comment 565f89
+    set -l red f7768e
+    set -l orange ff9e64
+    set -l yellow e0af68
+    set -l green 9ece6a
+    set -l purple 9d7cd8
+    set -l cyan 7dcfff
+    set -l pink bb9af7
+
+    # Syntax highlighting colors. Set globally so they take precedence over any
+    # universal fish_color_* values.
+    set -g fish_color_normal $foreground
+    set -g fish_color_command $cyan
+    set -g fish_color_keyword $pink
+    set -g fish_color_quote $yellow
+    set -g fish_color_redirection $foreground
+    set -g fish_color_end $orange
+    set -g fish_color_option $pink
+    set -g fish_color_error $red
+    set -g fish_color_param $purple
+    set -g fish_color_comment $comment
+    set -g fish_color_selection --background=$selection
+    set -g fish_color_search_match --background=$selection
+    set -g fish_color_operator $green
+    set -g fish_color_escape $pink
+    set -g fish_color_autosuggestion $comment
+
+    # Completion pager colors
+    set -g fish_pager_color_progress $comment
+    set -g fish_pager_color_prefix $cyan
+    set -g fish_pager_color_completion $foreground
+    set -g fish_pager_color_description $yellow
+    set -g fish_pager_color_selected_background --background=$selection
+
+    # ┌──────────────────────────────────────────────────────────────────────────┐
+    # │ Abbreviations                                                            │
+    # └──────────────────────────────────────────────────────────────────────────┘
+
+    abbr --add lsa "ls --all" # ls, plus hidden files
+    abbr --add lt "eza --tree --level=2 --long --icons=auto --git" # Two-level tree with git status
+    abbr --add n nvim
+    abbr --add ff fastfetch
+    abbr --add lg lazygit
+
+    # ┌──────────────────────────────────────────────────────────────────────────┐
+    # │ Functions                                                                │
+    # └──────────────────────────────────────────────────────────────────────────┘
+
+    # Long view: header + recursive dir sizes, directories first (no hidden).
+    # --total-size stats every file in a directory and is slow in large trees.
+    # --icons=auto, not bare --icons: that flag takes an optional value and would
+    # swallow the path passed after it.
+    function ls --wraps eza --description "eza long view with total sizes"
+        eza --long --header --total-size --icons=auto --group-directories-first $argv
+    end
+
+    # From the Yazi docs: cd to the directory yazi was in when it exited.
+    function y
+        set tmp (mktemp -t "yazi-cwd.XXXXXX")
+        command yazi $argv --cwd-file="$tmp"
+        if read -z cwd <"$tmp"; and [ "$cwd" != "$PWD" ]; and test -d "$cwd"
+            builtin cd -- "$cwd"
+        end
+        command rm -f -- "$tmp"
+    end
+end

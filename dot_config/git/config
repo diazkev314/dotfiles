@@ -1,0 +1,21 @@
+[user]
+	name = Kevin Diaz
+	email = developer@kev314.dev
+	signingkey = "key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA9SvPe8Psw9urHZfHqMQZ5uAoLc74pVqhxUHafpar9K"
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[push]
+	autoSetupRemote = true
+[pull]
+	rebase = true
+[diff]
+	algorithm = histogram
+	colorMoved = plain
+[branch]
+	sort = -committerdate
