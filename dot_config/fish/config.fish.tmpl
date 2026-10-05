@@ -27,11 +27,18 @@ fish_add_path -g ~/.local/bin ~/.bun/bin ~/.grok/bin
 
 # git prefers VISUAL over EDITOR, so VISUAL is what opens commit messages.
 # VS Code needs --wait, otherwise it returns at once and git reads an empty buffer.
+# Machines without a GUI have no VS Code, so commit messages open in Neovim.
 set -gx EDITOR nvim
+{{ if .hasGUI -}}
 set -gx VISUAL "code --wait"
+{{- else -}}
+set -gx VISUAL nvim
+{{- end }}
 set -gx SUDO_EDITOR nvim
+{{- if .hasGUI }}
 
 set -gx TERMINAL ghostty
+{{- end }}
 
 # bun's install root.
 set -gx BUN_INSTALL "$HOME/.bun"

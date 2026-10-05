@@ -11,3 +11,13 @@
 # Zed is only installed on Omarchy.
 .config/zed
 {{ end -}}
+
+{{ if not .hasGUI -}}
+# Machines without a GUI have no desktop apps, so their configs are skipped.
+.config/ghostty
+.config/hypr
+.config/vicinae
+.config/xdg-terminals.list
+.config/spotify-flags.conf
+.config/zed
+{{ end -}}

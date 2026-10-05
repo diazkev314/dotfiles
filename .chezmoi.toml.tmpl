@@ -1,0 +1,5 @@
+{{- /* Asked once per machine by `chezmoi init`, then stored in ~/.config/chezmoi/chezmoi.toml. */ -}}
+{{- $hasGUI := promptBoolOnce . "hasGUI" "Does this machine have a GUI" -}}
+
+[data]
+    hasGUI = {{ $hasGUI }}
