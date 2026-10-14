@@ -1,7 +1,7 @@
 [user]
 	name = Kevin Diaz
 	email = developer@kev314.dev
-	signingkey = "key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA9SvPe8Psw9urHZfHqMQZ5uAoLc74pVqhxUHafpar9K"
+	signingkey = ~/.ssh/github.pub
 [gpg]
 	format = ssh
 [gpg "ssh"]
